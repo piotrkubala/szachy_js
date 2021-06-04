@@ -8,10 +8,34 @@ function rysuj_szachownica(strona, czy_rysowac_wspolrzedne)
     else
         wylacz_wspolrzedne();
 
-    if(strona == 0)
+    if(strona === 0)
         przyg_szach_biale();
     else
         przyg_szach_czarne();
+}
+
+// rysuje lub usuwa obramowanie pola, z ktorego zostala zabrana bierka
+function zaznacz_pole_z_zabrana()
+{
+    let pole = document.getElementById("pole" + wzieta.y + wzieta.x);
+
+    if(wzieta.czy)
+        pole.src = folder_szachownica + (((wzieta.x + wzieta.y) % 2 == 0) ? "black_taken.png" : "white_taken.png");
+    else
+        pole.src = folder_szachownica + (((wzieta.x + wzieta.y) % 2 == 0) ? "black.png" : "white.png");
+}
+
+// zwraca kod HTML jednego diva pola szachownicy na podstawie jego wspolrzednych i szerokosci pola w pikselach
+function dodaj_jedno_pole(szerokosc_zdj, i, j)
+{
+    let html_pola = "<div class=\"pole\" id=\"pole_div" + i + j + "\" width=\"" + szerokosc_zdj + "px\"><img class=\"pole_zdj\" id=\"pole" + i + j + "\" width=\"" + szerokosc_zdj + "px\" src=\"" + folder_szachownica;
+    if((i + j) % 2 === 0)
+        html_pola += "black.png";
+    else
+        html_pola += "white.png";
+    html_pola += "\"/></div>"
+
+    return html_pola;
 }
 
 // przygotowuje szachownice od strony bialych
@@ -25,16 +49,11 @@ function przyg_szach_biale()
 
     for(let i = 7; i >= 0; i--)
         for(let j = 0; j < 8; j++)
-        {
-            zawartosc += "<img class=\"pole\" id=\"" + i + j + "\" width=\"" + szer_zdj + "px\" src=\"" + folder_szachownica;
-            if((i + j) % 2 == 0)
-                zawartosc += "black.png";
-            else
-                zawartosc += "white.png";
-            zawartosc += "\"/>"
-        }
+            zawartosc += dodaj_jedno_pole(szer_zdj, i, j);
     
     szach.innerHTML = zawartosc;
+
+    zaznacz_pole_z_zabrana();
 }
 
 // przygotowuje szachownice od strony czarnych
@@ -48,16 +67,11 @@ function przyg_szach_czarne()
 
     for(let i = 0; i < 8; i++)
         for(let j = 7; j >= 0; j--)
-        {
-            zawartosc += "<img class=\"pole\" id=\"" + i + j + "\" width=\"" + szer_zdj + "px\" src=\"" + folder_szachownica;
-            if((i + j) % 2 == 0)
-                zawartosc += "black.png";
-            else
-                zawartosc += "white.png";
-            zawartosc += "\"/>"
-        }
+            zawartosc += dodaj_jedno_pole(szer_zdj, i, j);
     
     szach.innerHTML = zawartosc;
+
+    zaznacz_pole_z_zabrana();
 }
 
 // rysuje wspolrzedne, argumentem jest 0, jezeli od bialych i 1 jezeli od czarnych

@@ -4,6 +4,8 @@ let rysowac_oznaczenia_wspolrzednych = true;// okresla czy nalezy rysowac oznacz
 //glowna funkcja
 function przygotuj()
 {
+    przygotuj_szachownice();
+    console.log(wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ e3 45 1"));// usunac pozniej
     narysuj();
     window.onresize = narysuj;
 }
