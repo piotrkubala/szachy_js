@@ -1,0 +1,69 @@
+*
+{
+    font-family: 'Roboto', sans-serif;
+}
+
+#gra
+{
+    margin-left: auto;
+    width: 80vw;
+}
+
+#wspolrzedne_y
+{
+    float: left;
+}
+
+#szachownica
+{
+    width: 40vw;
+    height: 40vw;
+    padding: 0px;
+    margin: 0px;
+    float: left;
+}
+
+#przyciski
+{
+    width: 30vw;
+    float: left;
+}
+
+#notacja
+{
+    width: 30vw;
+    clear: both;
+}
+
+.pole
+{
+    padding: 0px;
+    margin: 0px;
+    margin-top: -5px;
+}
+
+.przycisk
+{
+    text-align: center;
+    width: 20vw;
+    margin-top: 10px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+}
+
+.wspolrzedna_x
+{
+    text-align: center;
+    float: left;
+}
+
+.wspolrzedna_y
+{
+    text-align: center;
+}
+
+.nazwa
+{
+    font-size: 50px;
+    text-align: center;
+}
