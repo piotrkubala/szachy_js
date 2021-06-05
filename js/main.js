@@ -5,7 +5,7 @@ let rysowac_oznaczenia_wspolrzednych = true;// okresla czy nalezy rysowac oznacz
 function przygotuj()
 {
     przygotuj_szachownice();
-    console.log(wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ e3 45 1"));// usunac pozniej
+    wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     narysuj();
     window.onresize = narysuj;
 }
@@ -30,4 +30,25 @@ function przelacz_wyswietlanie_wspolrzednych_pol()
     rysowac_oznaczenia_wspolrzednych = !rysowac_oznaczenia_wspolrzednych;
 
     narysuj();
+}
+
+// probuje odczytac pozycje z notacji FEN wprowadzonej przez uzytkownika
+function wczytaj_z_FEN()
+{
+    let notacja_FEN = document.getElementById("wprowadzanie_FEN").value;
+    let div_blad = document.getElementById("bledny_FEN");
+
+    if(wypelnij_z_FEN(notacja_FEN))
+    {
+        // wprowadzona poprawna notacja FEN
+        document.getElementById("wprowadzanie_FEN").value = "";
+        div_blad.innerHTML = "";
+
+        narysuj();
+    }
+    else
+    {
+        // notacja FEN byla bledna
+        div_blad.innerHTML = "Wprowadzony FEN pozycji jest nieprawidlowy!";
+    }
 }

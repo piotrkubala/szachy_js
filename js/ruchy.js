@@ -30,12 +30,15 @@ function wypelnij_z_FEN(pozycja_FEN)
 {
     let nr_kolumny = -1, w_OO = false, w_OOO = false, b_OO = false, b_OOO = false, w_move = false;
     let liczba_polr = 0, liczba_ruch = 0;
+
+    let byl_krol_w = false, byl_krol_b = false;
+
     let pozycja = new Array();
 
     for(let i = 0; i < 8; i++)
         pozycja.push(new Array(8));
 
-    let wiersz = 0, kolumna = 0;
+    let wiersz = 7, kolumna = 0;
     let nr_ostatni_znak;
 
     // ustawianie pozycji
@@ -64,17 +67,32 @@ function wypelnij_z_FEN(pozycja_FEN)
             }
             else
             {
-                wiersz++;
+                wiersz--;
                 kolumna = 0;
             }
         }
         else
         {
+            if((nr_bierki === 6 || nr_bierki === 12) && (wiersz === 0 || wiersz === 7))
+                return false;
+
+            if(byl_krol_w && nr_bierki === 1)
+                return false;
+
+            if(byl_krol_b && nr_bierki === 7)
+                return false;
+
+            if(nr_bierki === 1)
+                byl_krol_w = true;
+
+            if(nr_bierki === 7)
+                byl_krol_b = true;
+
             pozycja[wiersz][kolumna] = nr_bierki;
             kolumna++;
         }
 
-        if(wiersz === 7 && kolumna === 8)
+        if(wiersz === 0 && kolumna === 8)
         {
             nr_ostatni_znak = i + 1;
             break;
@@ -189,8 +207,6 @@ function wypelnij_z_FEN(pozycja_FEN)
     szachownica.mozna_roszada_czarne_OOO = b_OOO;
     szachownica.biale_ruch = w_move;
     szachownica.liczba_polowek_od_r = liczba_polr;
-
-    console.log(szachownica);
 
     return true;
 }

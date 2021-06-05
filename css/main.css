@@ -35,6 +35,32 @@
     clear: both;
 }
 
+#wprowadzanie_FEN_div
+{
+    margin: auto;
+    width: 80vw;
+}
+
+#wprowadzanie_FEN
+{
+    width: 60vw;
+}
+
+#zatwierdz_FEN
+{
+    width: 30vw;
+    margin-left: 20vw;
+    text-align: center;
+}
+
+#bledny_FEN
+{
+    color: red;
+    text-align: center;
+    width: 30vw;
+    margin-left: 20vw;
+}
+
 .pole
 {
     padding: 0px;
@@ -67,4 +93,9 @@
 {
     font-size: 50px;
     text-align: center;
+}
+
+.bierka_zdj
+{
+    position: absolute;
 }

@@ -28,12 +28,29 @@ function zaznacz_pole_z_zabrana()
 // zwraca kod HTML jednego diva pola szachownicy na podstawie jego wspolrzednych i szerokosci pola w pikselach
 function dodaj_jedno_pole(szerokosc_zdj, i, j)
 {
+    let czy_to_pole_wz = (wzieta.czy && wzieta.x === i && wzieta.y === i);
+
     let html_pola = "<div class=\"pole\" id=\"pole_div" + i + j + "\" width=\"" + szerokosc_zdj + "px\"><img class=\"pole_zdj\" id=\"pole" + i + j + "\" width=\"" + szerokosc_zdj + "px\" src=\"" + folder_szachownica;
     if((i + j) % 2 === 0)
-        html_pola += "black.png";
+        html_pola += "black";
     else
-        html_pola += "white.png";
-    html_pola += "\"/></div>"
+        html_pola += "white";
+    
+    if(czy_to_pole_wz)
+        html_pola += "_taken";
+
+    html_pola += ".png\"/>";
+
+    if(!czy_to_pole_wz && szachownica.pola[i][j] != 0)
+    {
+        // rysowanie obrazka bierki
+        let sciezka = numer_na_sciezke(szachownica.pola[i][j]);
+
+        html_pola += "<img class=\"bierka_zdj\" width=\"" + szerokosc_zdj + "px\" src=\"" + sciezka + "\"";
+        html_pola += "style=\"margin-left: -" + szerokosc_zdj + "px\"/>";
+    }
+
+    html_pola += "</div>"
 
     return html_pola;
 }
