@@ -10,17 +10,65 @@ let szachownica =
     liczba_polowek_od_r: 0 // okresla liczbe polruchow od ostatniego zbicia/ruchu pionem
 }
 
-// przygotowuje pusta szachownice jako szachownica.pola
+let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
+
+let dostepne; // tablica 2D, przechowuje wartosc bool okreslajaca czy trzymana bierka moze przemiescic sie na dane pole
+
+// przygotowuje pusta szachownice jako szachownica.pola i tablice dostepne
 function przygotuj_szachownice()
 {
     szachownica.pola = new Array();
+    dostepne = new Array();
 
     for(let i = 0; i < 8; i++)
     {
         szachownica.pola.push(new Array(8));
+        dostepne.push(new Array(8));
         for(let j = 0; j < 8; j++)
+        {
             szachownica.pola[i][j] = 0;
+            dostepne[i][j] = false;
+        }
     }
+}
+
+// oblicza dostepne ruchy dla wzietej bierki
+function oblicz_dostepne()
+{
+
+}
+
+// uzupelnic te funkcje!!!
+// sprawdza czy mozliwe jest zabranie bierki z pola o podanych wspolrzednych,
+// jezeli tak, to zaznacza ta bierke jako wzieta i wylicza dostepne pola,
+// na ktore moze sie ruszyc, pozniej rysuje szachownice
+function wez_lub_przesun_bierke(wiersz, kolumna)
+{
+    let czy_moze_ruszyc = (gracz_jako_bialy && szachownica.pola[wiersz][kolumna] <= 6 && szachownica.pola[wiersz][kolumna] >= 1);
+    czy_moze_ruszyc ||= (!gracz_jako_bialy && szachownica.pola[wiersz][kolumna] >= 7 && szachownica.pola[wiersz][kolumna] <= 12);
+
+    if(wzieta.czy && dostepne[wiersz][kolumna])
+    {
+        // wykonuje ruch
+        szachownica.pola[wiersz][kolumna] = szachownica.pola[wzieta.wiersz][wzieta.kolumna];
+        szachownica.pola[wzieta.wiersz][wzieta.kolumna] = 0;
+        wzieta.czy = false;
+        biale_ruch = !biale_ruch;
+
+        // sprawdzic en passant tu!!!
+    }
+    else if((wzieta.czy && wzieta.wiersz === wiersz && wzieta.kolumna === kolumna) || !czy_moze_ruszyc)
+        wzieta.czy = false;
+    else
+    {
+        wzieta.czy = true;
+        wzieta.wiersz = wiersz;
+        wzieta.kolumna = kolumna;
+        
+        oblicz_dostepne();
+    }
+
+    narysuj();
 }
 
 // zrobic obsluge reszty bledow

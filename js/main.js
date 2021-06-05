@@ -16,6 +16,20 @@ function narysuj()
     rysuj_szachownica(strona_rysowanie, rysowac_oznaczenia_wspolrzednych);
 }
 
+// przygotowuje wszystko do nowej gry
+function nowa_partia()
+{
+    przygotuj_szachownice();
+    wzieta = 
+    {
+        x: 0,
+        y: 0,
+        czy: false
+    };
+    wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    narysuj();
+}
+
 // obraca i rysuje szachownice
 function obroc_szachownice()
 {

@@ -14,23 +14,13 @@ function rysuj_szachownica(strona, czy_rysowac_wspolrzedne)
         przyg_szach_czarne();
 }
 
-// rysuje lub usuwa obramowanie pola, z ktorego zostala zabrana bierka
-function zaznacz_pole_z_zabrana()
-{
-    let pole = document.getElementById("pole" + wzieta.y + wzieta.x);
-
-    if(wzieta.czy)
-        pole.src = folder_szachownica + (((wzieta.x + wzieta.y) % 2 == 0) ? "black_taken.png" : "white_taken.png");
-    else
-        pole.src = folder_szachownica + (((wzieta.x + wzieta.y) % 2 == 0) ? "black.png" : "white.png");
-}
-
 // zwraca kod HTML jednego diva pola szachownicy na podstawie jego wspolrzednych i szerokosci pola w pikselach
 function dodaj_jedno_pole(szerokosc_zdj, i, j)
 {
-    let czy_to_pole_wz = (wzieta.czy && wzieta.x === i && wzieta.y === i);
+    let czy_to_pole_wz = (wzieta.czy && wzieta.wiersz === i && wzieta.kolumna === j);
 
-    let html_pola = "<div class=\"pole\" id=\"pole_div" + i + j + "\" width=\"" + szerokosc_zdj + "px\"><img class=\"pole_zdj\" id=\"pole" + i + j + "\" width=\"" + szerokosc_zdj + "px\" src=\"" + folder_szachownica;
+    let html_pola = "<div class=\"pole\" onclick=\"wez_lub_przesun_bierke(" + i + ", " + j + ")\" ";
+    html_pola += "id=\"pole_div" + i + j + "\" width=\"" + szerokosc_zdj + "px\"><img class=\"pole_zdj\" id=\"pole" + i + j + "\" width=\"" + szerokosc_zdj + "px\" src=\"" + folder_szachownica;
     if((i + j) % 2 === 0)
         html_pola += "black";
     else
@@ -38,10 +28,23 @@ function dodaj_jedno_pole(szerokosc_zdj, i, j)
     
     if(czy_to_pole_wz)
         html_pola += "_taken";
+    else if(wzieta.czy && dostepne[i][j])
+    {
+        if(szachownica.pola[i][j] === 0)
+        {
+            // puste pole, na ktore mozna sie przemiescic
+            html_pola += "_can_move";
+        }
+        else
+        {
+            // mozna zbic bierke na tym polu
+            html_pola += "_can_take";
+        }
+    }
 
     html_pola += ".png\"/>";
 
-    if(!czy_to_pole_wz && szachownica.pola[i][j] != 0)
+    if(szachownica.pola[i][j] !== 0)
     {
         // rysowanie obrazka bierki
         let sciezka = numer_na_sciezke(szachownica.pola[i][j]);
@@ -69,8 +72,6 @@ function przyg_szach_biale()
             zawartosc += dodaj_jedno_pole(szer_zdj, i, j);
     
     szach.innerHTML = zawartosc;
-
-    zaznacz_pole_z_zabrana();
 }
 
 // przygotowuje szachownice od strony czarnych
@@ -87,8 +88,6 @@ function przyg_szach_czarne()
             zawartosc += dodaj_jedno_pole(szer_zdj, i, j);
     
     szach.innerHTML = zawartosc;
-
-    zaznacz_pole_z_zabrana();
 }
 
 // rysuje wspolrzedne, argumentem jest 0, jezeli od bialych i 1 jezeli od czarnych

@@ -3,8 +3,8 @@ const folder_bierki = "data/img/default_pieces/";
 // okresla czy obecnie jedna z bierek jest trzymana przez gracza i z jakiego pola zostala wzieta
 let wzieta = 
 {
-    x: 0,
-    y: 0,
+    wiersz: 0,
+    kolumna: 0,
     czy: false
 };
 
