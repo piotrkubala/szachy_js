@@ -7,7 +7,18 @@ let szachownica =
     mozna_roszada_czarne_OO: true, // okresla czy czarne moga zrobic roszade krotka
     mozna_roszada_czarne_OOO: true, // okresla czy czarne moga zrobic roszade dluga
     biale_ruch: true, // okresla kto wykonuje ruch, true - biale, false - czarne
-    liczba_polowek_od_r: 0 // okresla liczbe polruchow od ostatniego zbicia/ruchu pionem
+    liczba_polowek_od_r: 0, // okresla liczbe polruchow od ostatniego zbicia/ruchu pionem
+    poz_krol_biale: // pozycja bialego krola
+    {
+        wiersz: 0,
+        kolumna: 0
+    },
+    poz_krol_czarne: // pozycja czarnego krola
+    {
+        wiersz: 0,
+        kolumna: 0
+    },
+    zostalo: new Array(13) // przechowuje informacje o ilosci pozostalych na szachownicy bierek
 }
 
 let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
@@ -17,8 +28,13 @@ let dostepne; // tablica 2D, przechowuje wartosc bool okreslajaca czy trzymana b
 // przygotowuje pusta szachownice jako szachownica.pola i tablice dostepne
 function przygotuj_szachownice()
 {
+    szachownica.zostalo = new Array(13);
+
     szachownica.pola = new Array();
     dostepne = new Array();
+
+    for(let i = 0; i < 13; i++)
+        szachownica.zostalo[i] = 0;
 
     for(let i = 0; i < 8; i++)
     {
@@ -30,6 +46,65 @@ function przygotuj_szachownice()
             dostepne[i][j] = false;
         }
     }
+}
+
+// dla danej pozycji zwraca numer bierki, jezeli pozycja nalezy do szachownicy,
+// w przeciwnym wypadku zwraca -1
+function nr_bierki_na_poz(wiersz, kolumna)
+{
+    if(wiersz > 7 || kolumna > 7 || wiersz < 0 || kolumna < 0)
+        return -1;
+    return szachownica.pola[wiersz][kolumna];
+}
+
+// zwraca true, jezeli krol sprawdzanej strony jest w szachu
+// argument: true, jezeli sprawdzamy dla bialych, false, jezeli dla czarnych
+function czy_szach(dla_bialych)
+{
+    let k_wiersz, k_kolumna;
+
+    if(dla_bialych)
+    {
+        k_wiersz = szachownica.poz_krol_biale.wiersz;
+        k_kolumna = szachownica.poz_krol_biale.kolumna;
+
+        if(czy_szach_od_krol_lub_hetman1(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+        
+        if(szachownica.zostalo[12] && czy_szach_od_pion(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+
+        if((szachownica.zostalo[8] || szachownica.zostalo[10]) && czy_szach_od_goniec_lub_hetman(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+        
+        if((szachownica.zostalo[8] || szachownica.zostalo[9]) && czy_szach_od_wieza_lub_hetman(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+        
+        if(szachownica.zostalo[11] && czy_szach_od_skoczek(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+    }
+    else
+    {
+        k_wiersz = szachownica.poz_krol_czarne.wiersz;
+        k_kolumna = szachownica.poz_krol_czarne.kolumna;
+
+        if(czy_szach_od_krol_lub_hetman1(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+        
+        if(szachownica.zostalo[6] && czy_szach_od_pion(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+
+        if((szachownica.zostalo[2] || szachownica.zostalo[4]) && czy_szach_od_goniec_lub_hetman(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+        
+        if((szachownica.zostalo[2] || szachownica.zostalo[3]) && czy_szach_od_wieza_lub_hetman(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+        
+        if(szachownica.zostalo[5] && czy_szach_od_skoczek(dla_bialych, k_wiersz, k_kolumna))
+            return true;
+    }
+
+    return false;
 }
 
 // oblicza dostepne ruchy dla wzietej bierki
@@ -50,6 +125,19 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
     if(wzieta.czy && dostepne[wiersz][kolumna])
     {
         // wykonuje ruch
+        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 1)
+        {
+            szachownica.poz_krol_biale.wiersz = wiersz;
+            szachownica.poz_krol_biale.kolumna = kolumna;
+        }
+        else if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 7)
+        {
+            szachownica.poz_krol_czarne.wiersz = wiersz;
+            szachownica.poz_krol_czarne.kolumna = kolumna;
+        }
+
+        szachownica.zostalo[szachownica.pola[wiersz][kolumna]]--;
+
         szachownica.pola[wiersz][kolumna] = szachownica.pola[wzieta.wiersz][wzieta.kolumna];
         szachownica.pola[wzieta.wiersz][wzieta.kolumna] = 0;
         wzieta.czy = false;
@@ -131,10 +219,22 @@ function wypelnij_z_FEN(pozycja_FEN)
                 return false;
 
             if(nr_bierki === 1)
+            {
                 byl_krol_w = true;
 
+                szachownica.poz_krol_biale.wiersz = wiersz;
+                szachownica.poz_krol_biale.kolumna = kolumna;
+            }
+
             if(nr_bierki === 7)
+            {
                 byl_krol_b = true;
+
+                szachownica.poz_krol_czarne.wiersz = wiersz;
+                szachownica.poz_krol_czarne.kolumna = kolumna;
+            }
+
+            szachownica.zostalo[nr_bierki]++;
 
             pozycja[wiersz][kolumna] = nr_bierki;
             kolumna++;
@@ -146,6 +246,9 @@ function wypelnij_z_FEN(pozycja_FEN)
             break;
         }
     }
+
+    if(!byl_krol_w || !byl_krol_b)
+        return false;
 
     // spacje przed znakiem okreslajacym kto wykonuje ruch
     while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] === " ")
