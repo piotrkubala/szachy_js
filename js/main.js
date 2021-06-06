@@ -6,6 +6,7 @@ function przygotuj()
 {
     przygotuj_szachownice();
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    ruchy_dostepne = generuj_ruchy();
     narysuj();
     window.onresize = narysuj;
 }
@@ -27,6 +28,7 @@ function nowa_partia()
         czy: false
     };
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    ruchy_dostepne = generuj_ruchy();
     narysuj();
 }
 
@@ -57,6 +59,8 @@ function wczytaj_z_FEN()
         // wprowadzona poprawna notacja FEN
         document.getElementById("wprowadzanie_FEN").value = "";
         div_blad.innerHTML = "";
+
+        ruchy_dostepne = generuj_ruchy();
 
         narysuj();
     }

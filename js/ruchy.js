@@ -25,6 +25,13 @@ let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
 
 let dostepne; // tablica 2D, przechowuje wartosc bool okreslajaca czy trzymana bierka moze przemiescic sie na dane pole
 
+// tablica dostepnych ruchow teraz
+let ruchy_dostepne =
+{
+    ruchy: Array(),
+    zbicia: Array()
+};
+
 // przygotowuje pusta szachownice jako szachownica.pola i tablice dostepne
 function przygotuj_szachownice()
 {
@@ -107,10 +114,79 @@ function czy_szach(dla_bialych)
     return false;
 }
 
-// oblicza dostepne ruchy dla wzietej bierki
-function oblicz_dostepne()
+// generuje mozliwe ruchy
+// zwraca obiekt zawierajacy 2 tablice: {zbicia: Array(), ruchy: Array()}
+// elementy tablic sa obiektami {wiersz_p, kolumna_p, wiersz_k, kolumna_k}
+// opisujacymi wspolrzedne poczatkowe i koncowe ruchu
+function generuj_ruchy()
 {
+    let ruchy =
+    {
+        zbicia: Array(),
+        ruchy: Array()
+    };
 
+    let czy_biale = szachownica.biale_ruch;
+
+    for(let wiersz = 0; wiersz < 8; wiersz++)
+    {
+        for(let kolumna = 0; kolumna < 8; kolumna++)
+        {
+            let nr_bierki = szachownica.pola[wiersz][kolumna];
+
+            if((czy_biale && nr_bierki <= 6 && nr_bierki >= 1) || (!czy_biale && nr_bierki <= 12 && nr_bierki >= 7))
+            {
+                // generuj ruch
+
+                if(!czy_biale)
+                    nr_bierki -= 6;
+
+                switch(nr_bierki)
+                {
+                    case 1: // krol
+                        generuj_ruch_krol(czy_biale, ruchy, wiersz, kolumna);
+                        break;
+                    case 2: // hetman
+                        generuj_ruch_hetman(czy_biale, ruchy, wiersz, kolumna);
+                        break;
+                    case 3: // wieza
+                        generuj_ruch_wieza(czy_biale, ruchy, wiersz, kolumna);
+                        break;
+                    case 4: // goniec
+                        generuj_ruch_goniec(czy_biale, ruchy, wiersz, kolumna);
+                        break;
+                    case 5: // skoczek
+                        generuj_ruch_skoczek(czy_biale, ruchy, wiersz, kolumna);
+                        break;
+                    case 6: // pion
+                        generuj_ruch_pion(czy_biale, ruchy, wiersz, kolumna);
+                        break;
+                }
+            }
+        }
+    }
+
+    return ruchy;
+}
+
+// zaznacza dostepne ruchy dla wzietej bierki
+function zaznacz_dostepne()
+{
+    for(let i = 0; i < 8; i++)
+        for(let j = 0; j < 8; j++)
+            dostepne[i][j] = false;
+
+    for(let i = 0; i < ruchy_dostepne.ruchy.length; i++)
+    {
+        if(wzieta.wiersz === ruchy_dostepne.ruchy[i].wiersz_p && wzieta.kolumna === ruchy_dostepne.ruchy[i].kolumna_p)
+            dostepne[ruchy_dostepne.ruchy[i].wiersz_k][ruchy_dostepne.ruchy[i].kolumna_k] = true;
+    }
+
+    for(let i = 0; i < ruchy_dostepne.zbicia.length; i++)
+    {
+        if(wzieta.wiersz === ruchy_dostepne.zbicia[i].wiersz_p && wzieta.kolumna === ruchy_dostepne.zbicia[i].kolumna_p)
+            dostepne[ruchy_dostepne.zbicia[i].wiersz_k][ruchy_dostepne.zbicia[i].kolumna_k] = true;
+    }
 }
 
 // uzupelnic te funkcje!!!
@@ -119,8 +195,8 @@ function oblicz_dostepne()
 // na ktore moze sie ruszyc, pozniej rysuje szachownice
 function wez_lub_przesun_bierke(wiersz, kolumna)
 {
-    let czy_moze_ruszyc = (gracz_jako_bialy && szachownica.pola[wiersz][kolumna] <= 6 && szachownica.pola[wiersz][kolumna] >= 1);
-    czy_moze_ruszyc ||= (!gracz_jako_bialy && szachownica.pola[wiersz][kolumna] >= 7 && szachownica.pola[wiersz][kolumna] <= 12);
+    let czy_moze_ruszyc = (szachownica.biale_ruch && gracz_jako_bialy && szachownica.pola[wiersz][kolumna] <= 6 && szachownica.pola[wiersz][kolumna] >= 1);
+    czy_moze_ruszyc ||= (!szachownica.biale_ruch && !gracz_jako_bialy && szachownica.pola[wiersz][kolumna] >= 7 && szachownica.pola[wiersz][kolumna] <= 12);
 
     if(wzieta.czy && dostepne[wiersz][kolumna])
     {
@@ -141,9 +217,10 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
         szachownica.pola[wiersz][kolumna] = szachownica.pola[wzieta.wiersz][wzieta.kolumna];
         szachownica.pola[wzieta.wiersz][wzieta.kolumna] = 0;
         wzieta.czy = false;
-        biale_ruch = !biale_ruch;
+        szachownica.biale_ruch = !szachownica.biale_ruch;
 
         // sprawdzic en passant tu!!!
+        // zrobic obsluge promocji piona
     }
     else if((wzieta.czy && wzieta.wiersz === wiersz && wzieta.kolumna === kolumna) || !czy_moze_ruszyc)
         wzieta.czy = false;
@@ -153,13 +230,13 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
         wzieta.wiersz = wiersz;
         wzieta.kolumna = kolumna;
         
-        oblicz_dostepne();
+        zaznacz_dostepne();
     }
 
     narysuj();
 }
 
-// zrobic obsluge reszty bledow
+// zrobic obsluge reszty bledow!!! (szach, bicie w przelocie, sprawdzanie roszady)
 // na podstawie FEN podanego jako argument, zmienia pozycje ustawiona na szachownica.pola
 // zmienia pozycje w obiekcie szachownica, zwraca false, jezeli bledny FEN
 function wypelnij_z_FEN(pozycja_FEN)
@@ -358,6 +435,9 @@ function wypelnij_z_FEN(pozycja_FEN)
     szachownica.mozna_roszada_czarne_OOO = b_OOO;
     szachownica.biale_ruch = w_move;
     szachownica.liczba_polowek_od_r = liczba_polr;
+    gracz_jako_bialy = w_move;
+
+    strona_rysowanie = w_move ? 0 : 1;
 
     return true;
 }
