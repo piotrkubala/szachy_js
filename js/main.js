@@ -29,6 +29,7 @@ function nowa_partia()
     };
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     ruchy_dostepne = generuj_ruchy();
+
     narysuj();
 }
 
@@ -36,6 +37,16 @@ function nowa_partia()
 function obroc_szachownice()
 {
     strona_rysowanie = 1 - strona_rysowanie;
+
+    narysuj();
+}
+
+// dokonczyc, gdy bedzie juz dzialac SI!!!
+// zmienia strone gracza ludzkiego
+function zmien_kolor_gracza()
+{
+    gracz_jako_bialy = !gracz_jako_bialy;
+    ruchy_dostepne = generuj_ruchy();
 
     narysuj();
 }

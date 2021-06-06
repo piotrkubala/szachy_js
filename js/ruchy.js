@@ -212,14 +212,38 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
             szachownica.poz_krol_czarne.kolumna = kolumna;
         }
 
-        szachownica.zostalo[szachownica.pola[wiersz][kolumna]]--;
+        if(szachownica.pola[wiersz][kolumna] !== 0)
+            szachownica.zostalo[szachownica.pola[wiersz][kolumna]]--;
+
+        // en passant - zaznaczanie kolumny dla bialych
+        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 6 && wzieta.wiersz === 1 && wiersz === 3)
+            szachownica.nr_kolumny_en_passant = kolumna;
+        else
+            szachownica.nr_kolumny_en_passant = -1;
+
+        // en passant - zaznaczanie kolumny dla czarnych
+        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 12 && wzieta.wiersz === 6 && wiersz === 4)
+            szachownica.nr_kolumny_en_passant = kolumna;
+        else
+            szachownica.nr_kolumny_en_passant = -1;
+
+        // en passant biale
+        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 6 && szachownica.pola[wiersz][kolumna] === 0 && wzieta.kolumna != kolumna)
+        {
+            szachownica.pola[wzieta.wiersz][kolumna] = 0;
+            szachownica.zostalo[12]--;
+        }
+        else if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 12 && szachownica.pola[wiersz][kolumna] === 0 && wzieta.kolumna != kolumna) // en passant czarne
+        {
+            szachownica.pola[wzieta.wiersz][kolumna] = 0;
+            szachownica.zostalo[6]--;
+        }
 
         szachownica.pola[wiersz][kolumna] = szachownica.pola[wzieta.wiersz][wzieta.kolumna];
         szachownica.pola[wzieta.wiersz][wzieta.kolumna] = 0;
         wzieta.czy = false;
         szachownica.biale_ruch = !szachownica.biale_ruch;
 
-        // sprawdzic en passant tu!!!
         // zrobic obsluge promocji piona
     }
     else if((wzieta.czy && wzieta.wiersz === wiersz && wzieta.kolumna === kolumna) || !czy_moze_ruszyc)
