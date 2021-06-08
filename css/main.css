@@ -61,6 +61,13 @@
     margin-left: 20vw;
 }
 
+#wynik_gry
+{
+    text-align: center;
+    font-size: 40px;
+    color: red;
+}
+
 .pole
 {
     padding: 0px;

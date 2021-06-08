@@ -4,6 +4,7 @@ let rysowac_oznaczenia_wspolrzednych = true;// okresla czy nalezy rysowac oznacz
 //glowna funkcja
 function przygotuj()
 {
+    napisz_wynik(0);
     przygotuj_szachownice();
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     ruchy_dostepne = generuj_ruchy();
@@ -20,6 +21,7 @@ function narysuj()
 // przygotowuje wszystko do nowej gry
 function nowa_partia()
 {
+    napisz_wynik(0);
     przygotuj_szachownice();
     wzieta = 
     {
@@ -46,6 +48,9 @@ function obroc_szachownice()
 function zmien_kolor_gracza()
 {
     gracz_jako_bialy = !gracz_jako_bialy;
+
+    wykonaj_ruch_SI();
+
     ruchy_dostepne = generuj_ruchy();
 
     narysuj();

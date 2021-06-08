@@ -189,6 +189,60 @@ function zaznacz_dostepne()
     }
 }
 
+// zrobic obsluge promocji piona i roszady!!!
+// wykonuje na szachownicy podany ruch
+function wykonaj_ruch(ruch_t)
+{
+    if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 1)
+    {
+        szachownica.poz_krol_biale.wiersz = ruch_t.wiersz_k;
+        szachownica.poz_krol_biale.kolumna = ruch_t.kolumna_k;
+    }
+    else if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 7)
+    {
+        szachownica.poz_krol_czarne.wiersz = ruch_t.wiersz_k;
+        szachownica.poz_krol_czarne.kolumna = ruch_t.kolumna_k;
+    }
+
+    if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] !== 0)
+        szachownica.zostalo[szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k]]--;
+
+    if(szachownica.biale_ruch)
+    {
+        // en passant - zaznaczanie kolumny dla bialych
+        if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 6 && ruch_t.wiersz_p === 1 && ruch_t.wiersz_k === 3)
+            szachownica.nr_kolumny_en_passant = ruch_t.kolumna_k;
+        else
+            szachownica.nr_kolumny_en_passant = -1;
+    }
+    else
+    {
+        // en passant - zaznaczanie kolumny dla czarnych
+        if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 12 && ruch_t.wiersz_p === 6 && ruch_t.wiersz_k === 4)
+            szachownica.nr_kolumny_en_passant = ruch_t.kolumna_k;
+        else
+            szachownica.nr_kolumny_en_passant = -1;
+    }
+
+    // en passant biale
+    if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 6 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 0 && ruch_t.kolumna_p != ruch_t.kolumna_k)
+    {
+        szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_k] = 0;
+        szachownica.zostalo[12]--;
+    }
+    else if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 12 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 0 && ruch_t.kolumna_p != ruch_t.kolumna_k) // en passant czarne
+    {
+        szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_k] = 0;
+        szachownica.zostalo[6]--;
+    }
+
+    szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] = szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p];
+    szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] = 0;
+    szachownica.biale_ruch = !szachownica.biale_ruch;
+
+    // zrobic obsluge promocji piona i roszady
+}
+
 // uzupelnic te funkcje!!!
 // sprawdza czy mozliwe jest zabranie bierki z pola o podanych wspolrzednych,
 // jezeli tak, to zaznacza ta bierke jako wzieta i wylicza dostepne pola,
@@ -201,50 +255,43 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
     if(wzieta.czy && dostepne[wiersz][kolumna])
     {
         // wykonuje ruch
-        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 1)
+        let ruch_t =
         {
-            szachownica.poz_krol_biale.wiersz = wiersz;
-            szachownica.poz_krol_biale.kolumna = kolumna;
-        }
-        else if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 7)
-        {
-            szachownica.poz_krol_czarne.wiersz = wiersz;
-            szachownica.poz_krol_czarne.kolumna = kolumna;
-        }
+            wiersz_p: wzieta.wiersz,
+            kolumna_p: wzieta.kolumna,
+            wiersz_k: wiersz,
+            kolumna_k: kolumna
+        };
 
-        if(szachownica.pola[wiersz][kolumna] !== 0)
-            szachownica.zostalo[szachownica.pola[wiersz][kolumna]]--;
+        wykonaj_ruch(ruch_t);
 
-        // en passant - zaznaczanie kolumny dla bialych
-        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 6 && wzieta.wiersz === 1 && wiersz === 3)
-            szachownica.nr_kolumny_en_passant = kolumna;
-        else
-            szachownica.nr_kolumny_en_passant = -1;
-
-        // en passant - zaznaczanie kolumny dla czarnych
-        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 12 && wzieta.wiersz === 6 && wiersz === 4)
-            szachownica.nr_kolumny_en_passant = kolumna;
-        else
-            szachownica.nr_kolumny_en_passant = -1;
-
-        // en passant biale
-        if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 6 && szachownica.pola[wiersz][kolumna] === 0 && wzieta.kolumna != kolumna)
-        {
-            szachownica.pola[wzieta.wiersz][kolumna] = 0;
-            szachownica.zostalo[12]--;
-        }
-        else if(szachownica.pola[wzieta.wiersz][wzieta.kolumna] === 12 && szachownica.pola[wiersz][kolumna] === 0 && wzieta.kolumna != kolumna) // en passant czarne
-        {
-            szachownica.pola[wzieta.wiersz][kolumna] = 0;
-            szachownica.zostalo[6]--;
-        }
-
-        szachownica.pola[wiersz][kolumna] = szachownica.pola[wzieta.wiersz][wzieta.kolumna];
-        szachownica.pola[wzieta.wiersz][wzieta.kolumna] = 0;
         wzieta.czy = false;
-        szachownica.biale_ruch = !szachownica.biale_ruch;
 
-        // zrobic obsluge promocji piona
+        // obsluga promocji piona
+
+        wykonaj_ruch_SI();
+
+        ruchy_dostepne = generuj_ruchy();
+
+        // sprawdzanie czy jest mat/pat
+        if(ruchy_dostepne.ruchy.length + ruchy_dostepne.zbicia.length === 0)
+        {
+            if(czy_szach(szachownica.biale_ruch))
+            {
+                // mat, SI wygralo
+                napisz_wynik(szachownica.biale_ruch ? 2 : 1);
+            }
+            else
+            {
+                // pat, remis
+                napisz_wynik(3);
+            }
+
+            szachownica.biale_ruch = !szachownica.biale_ruch;
+            narysuj();
+
+            return;
+        }
     }
     else if((wzieta.czy && wzieta.wiersz === wiersz && wzieta.kolumna === kolumna) || !czy_moze_ruszyc)
         wzieta.czy = false;

@@ -14,6 +14,29 @@ function rysuj_szachownica(strona, czy_rysowac_wspolrzedne)
         przyg_szach_czarne();
 }
 
+// w divie wynik_gry zapisuje wynik obecnej gry na podstawie argumentu:
+// 0 - pusty, 1 - wygrana bialych, 2 - wygrana czarnych, 3 - remis
+function napisz_wynik(wynik)
+{
+    let div_t = document.getElementById("wynik_gry");
+
+    switch(wynik)
+    {
+        case 0:
+            div_t.innerText = "";
+            break;
+        case 1:
+            div_t.innerText = "Koniec gry - białe wygrały";
+            break;
+        case 2:
+            div_t.innerText = "Koniec gry - czarne wygrały";
+            break;
+        case 3:
+            div_t.innerText = "Koniec gry - remis";
+            break;
+    }
+}
+
 // zwraca kod HTML jednego diva pola szachownicy na podstawie jego wspolrzednych i szerokosci pola w pikselach
 function dodaj_jedno_pole(szerokosc_zdj, i, j)
 {
