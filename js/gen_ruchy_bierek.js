@@ -35,7 +35,7 @@ function czy_mozna_obecny_ruch(ruch_t, czy_biale)
 // generuje ruchy dla krola
 function generuj_ruch_krol(czy_biale, ruchy, wiersz, kolumna)
 {
-    let nr_bierki;
+    let nr_bierki, czy_moze_w_prawo = false, czy_moze_w_lewo = false, ruch_t;
 
     for(let i = -1; i <= 1; i++)
     {
@@ -68,7 +68,15 @@ function generuj_ruch_krol(czy_biale, ruchy, wiersz, kolumna)
                 if(!czy_szach(czy_biale))
                 {
                     if(nr_bierki === 0)
+                    {
                         ruchy.ruchy.push({wiersz_p: wiersz, kolumna_p: kolumna, wiersz_k: wiersz + i, kolumna_k: kolumna + j});
+
+                        // potrzebne przy roszadzie
+                        if(i === 0 && j > 0)
+                            czy_moze_w_prawo = true;
+                        else if(i === 0 && j < 0)
+                            czy_moze_w_lewo = true;
+                    }
                     else
                         ruchy.zbicia.push({wiersz_p: wiersz, kolumna_p: kolumna, wiersz_k: wiersz + i, kolumna_k: kolumna + j});
                 }
@@ -86,6 +94,80 @@ function generuj_ruch_krol(czy_biale, ruchy, wiersz, kolumna)
                     szachownica.poz_krol_czarne.wiersz = wiersz;
                     szachownica.poz_krol_czarne.kolumna = kolumna;
                 }
+            }
+        }
+    }
+
+    // roszada krotka
+    if(czy_moze_w_prawo && szachownica.pola[wiersz][kolumna + 2] === 0)
+    {
+        if((czy_biale && szachownica.mozna_roszada_biale_OO) || (!czy_biale && szachownica.mozna_roszada_czarne_OO))
+        {
+            // sprawdzanie czy jest mozliwa przez atak na krola
+            if(czy_biale)
+            {
+                szachownica.poz_krol_biale.kolumna = kolumna + 2;
+            }
+            else
+            {
+                szachownica.poz_krol_czarne.kolumna = kolumna + 2;
+            }
+
+            ruch_t =
+            {
+                wiersz_p: wiersz,
+                kolumna_p: kolumna,
+                wiersz_k: wiersz,
+                kolumna_k: kolumna + 2
+            }
+
+            if(czy_mozna_obecny_ruch(ruch_t, czy_biale))
+                ruchy.ruchy.push(ruch_t);
+
+            if(czy_biale)
+            {
+                szachownica.poz_krol_biale.kolumna = kolumna;
+            }
+            else
+            {
+                szachownica.poz_krol_czarne.kolumna = kolumna;
+            }
+        }
+    }
+
+    // roszada dluga
+    if(czy_moze_w_lewo && szachownica.pola[wiersz][kolumna - 2] === 0)
+    {
+        if((czy_biale && szachownica.mozna_roszada_biale_OOO) || (!czy_biale && szachownica.mozna_roszada_czarne_OOO))
+        {
+            // sprawdzanie czy jest mozliwa przez atak na krola
+            if(czy_biale)
+            {
+                szachownica.poz_krol_biale.kolumna = kolumna - 2;
+            }
+            else
+            {
+                szachownica.poz_krol_czarne.kolumna = kolumna - 2;
+            }
+
+            ruch_t =
+            {
+                wiersz_p: wiersz,
+                kolumna_p: kolumna,
+                wiersz_k: wiersz,
+                kolumna_k: kolumna - 2
+            }
+
+            if(czy_mozna_obecny_ruch(ruch_t, czy_biale))
+                ruchy.ruchy.push(ruch_t);
+
+            if(czy_biale)
+            {
+                szachownica.poz_krol_biale.kolumna = kolumna;
+            }
+            else
+            {
+                szachownica.poz_krol_czarne.kolumna = kolumna;
             }
         }
     }

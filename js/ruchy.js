@@ -193,16 +193,29 @@ function zaznacz_dostepne()
 // wykonuje na szachownicy podany ruch
 function wykonaj_ruch(ruch_t)
 {
+    // ruch krolem
     if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 1)
     {
         szachownica.poz_krol_biale.wiersz = ruch_t.wiersz_k;
         szachownica.poz_krol_biale.kolumna = ruch_t.kolumna_k;
+        szachownica.mozna_roszada_biale_OO = szachownica.mozna_roszada_biale_OOO = false; // nie mozna roszady po ruchu krolem
     }
     else if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 7)
     {
         szachownica.poz_krol_czarne.wiersz = ruch_t.wiersz_k;
         szachownica.poz_krol_czarne.kolumna = ruch_t.kolumna_k;
+        szachownica.mozna_roszada_czarne_OO = szachownica.mozna_roszada_czarne_OOO = false; // nie mozna roszady po ruchu krolem
     }
+
+    // nie mozna danej roszady po ruchu odpowiednia wieza
+    if(ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 0)
+        szachownica.mozna_roszada_biale_OOO = false;
+    else if(ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 7)
+        szachownica.mozna_roszada_biale_OO = false;
+    else if(ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 0)
+        szachownica.mozna_roszada_czarne_OOO = false;
+    else if(ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 7)
+        szachownica.mozna_roszada_czarne_OO = false;
 
     if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] !== 0)
         szachownica.zostalo[szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k]]--;
@@ -236,14 +249,30 @@ function wykonaj_ruch(ruch_t)
         szachownica.zostalo[6]--;
     }
 
+    
+    // wykonywanie roszady
+    if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 1 || szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 7)
+    {
+        if(ruch_t.kolumna_k - ruch_t.kolumna_p === 2) // roszada krotka
+        {
+            szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k - 1] = szachownica.pola[ruch_t.wiersz_p][7];
+            szachownica.pola[ruch_t.wiersz_p][7] = 0;
+        }
+        else if(ruch_t.kolumna_k - ruch_t.kolumna_p === -2) // roszada dluga
+        {
+            szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k + 1] = szachownica.pola[ruch_t.wiersz_p][0];
+            szachownica.pola[ruch_t.wiersz_p][0] = 0;
+        }
+    }
+
     szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] = szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p];
     szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] = 0;
     szachownica.biale_ruch = !szachownica.biale_ruch;
 
-    // zrobic obsluge promocji piona i roszady
+    // zrobic obsluge promocji piona
 }
 
-// uzupelnic te funkcje!!!
+// uzupelnic te funkcje o promocje piona
 // sprawdza czy mozliwe jest zabranie bierki z pola o podanych wspolrzednych,
 // jezeli tak, to zaznacza ta bierke jako wzieta i wylicza dostepne pola,
 // na ktore moze sie ruszyc, pozniej rysuje szachownice
@@ -305,210 +334,4 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
     }
 
     narysuj();
-}
-
-// zrobic obsluge reszty bledow!!! (szach, bicie w przelocie, sprawdzanie roszady)
-// na podstawie FEN podanego jako argument, zmienia pozycje ustawiona na szachownica.pola
-// zmienia pozycje w obiekcie szachownica, zwraca false, jezeli bledny FEN
-function wypelnij_z_FEN(pozycja_FEN)
-{
-    let nr_kolumny = -1, w_OO = false, w_OOO = false, b_OO = false, b_OOO = false, w_move = false;
-    let liczba_polr = 0, liczba_ruch = 0;
-
-    let byl_krol_w = false, byl_krol_b = false;
-
-    let pozycja = new Array();
-
-    for(let i = 0; i < 8; i++)
-        pozycja.push(new Array(8));
-
-    let wiersz = 7, kolumna = 0;
-    let nr_ostatni_znak;
-
-    // ustawianie pozycji
-    for(let i = 0; i < pozycja_FEN.length; i++)
-    {
-        let nr_bierki = kod_FEN_na_nr_bierki(pozycja_FEN[i]);
-
-        if(nr_bierki === 0)
-        {
-            // nie jest to kod bierki
-            if(pozycja_FEN[i] !== "/")
-            {
-                if(!isNaN(pozycja_FEN[i]))
-                {
-                    if(kolumna + parseInt(pozycja_FEN[i]) > 8)
-                        return false;
-
-                    for(let j = 0; j < pozycja_FEN[i]; j++)
-                    {
-                        pozycja[wiersz][kolumna] = 0;
-                        kolumna++;
-                    }
-                }
-                else
-                    return false;
-            }
-            else
-            {
-                wiersz--;
-                kolumna = 0;
-            }
-        }
-        else
-        {
-            if((nr_bierki === 6 || nr_bierki === 12) && (wiersz === 0 || wiersz === 7))
-                return false;
-
-            if(byl_krol_w && nr_bierki === 1)
-                return false;
-
-            if(byl_krol_b && nr_bierki === 7)
-                return false;
-
-            if(nr_bierki === 1)
-            {
-                byl_krol_w = true;
-
-                szachownica.poz_krol_biale.wiersz = wiersz;
-                szachownica.poz_krol_biale.kolumna = kolumna;
-            }
-
-            if(nr_bierki === 7)
-            {
-                byl_krol_b = true;
-
-                szachownica.poz_krol_czarne.wiersz = wiersz;
-                szachownica.poz_krol_czarne.kolumna = kolumna;
-            }
-
-            szachownica.zostalo[nr_bierki]++;
-
-            pozycja[wiersz][kolumna] = nr_bierki;
-            kolumna++;
-        }
-
-        if(wiersz === 0 && kolumna === 8)
-        {
-            nr_ostatni_znak = i + 1;
-            break;
-        }
-    }
-
-    if(!byl_krol_w || !byl_krol_b)
-        return false;
-
-    // spacje przed znakiem okreslajacym kto wykonuje ruch
-    while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] === " ")
-        nr_ostatni_znak++;
-
-    if(pozycja_FEN.length === nr_ostatni_znak || (pozycja_FEN[nr_ostatni_znak] != "w" && pozycja_FEN[nr_ostatni_znak] != "b"))
-        return false;
-
-    w_move = pozycja_FEN[nr_ostatni_znak] === "w";
-    nr_ostatni_znak++;
-
-    // spacje przed znakami okreslajacymi mozliwosc wykonania roszady
-    while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] === " ")
-        nr_ostatni_znak++;
-
-    if(pozycja_FEN.length === nr_ostatni_znak)
-        return false;
-
-    if(pozycja_FEN[nr_ostatni_znak] !== "-")
-    {
-        while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] != " ")
-        {
-            let znak = pozycja_FEN[nr_ostatni_znak]
-
-            if(znak === "K")
-                w_OO = true;
-            else if(znak === "Q")
-                w_OOO = true;
-            else if(znak === "k")
-                b_OO = true;
-            else if(znak === "q")
-                b_OOO = true;
-            else
-                return false;
-            
-            nr_ostatni_znak++;
-        }
-    }
-    else
-        nr_ostatni_znak++;
-
-    // spacje przed znakami okreslajacymi mozliwosci bicia w przelocie
-    while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] === " ")
-        nr_ostatni_znak++;
-
-    if(pozycja_FEN.length === nr_ostatni_znak)
-        return false;
-    
-    if(pozycja_FEN[nr_ostatni_znak] !== "-")
-    {
-        let znak = pozycja_FEN[nr_ostatni_znak]
-
-        if(nr_ostatni_znak + 1 >= pozycja_FEN.length || isNaN(pozycja_FEN[nr_ostatni_znak + 1]) || znak.charCodeAt(0) > "h".charCodeAt(0) || znak.charCodeAt(0) < "a".charCodeAt(0))
-            return false;
-        
-        nr_kolumny = znak.charCodeAt(0) - "a".charCodeAt(0);
-        nr_ostatni_znak += 2;
-    }
-    else
-        nr_ostatni_znak++;
-
-    // spacje przed iloscia polruchow od ostatniego zerowania zasady 50
-    while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] === " ")
-        nr_ostatni_znak++;
-
-    if(pozycja_FEN.length <= nr_ostatni_znak + 1)
-        return false;
-
-    if(!isNaN(pozycja_FEN[nr_ostatni_znak]))
-    {
-        liczba_polr = pozycja_FEN.charCodeAt(nr_ostatni_znak) - "0".charCodeAt(0);
-    }
-    else
-        return false;
-    
-    nr_ostatni_znak++;
-    if(pozycja_FEN[nr_ostatni_znak] !== " ")
-    {
-        if(!isNaN(pozycja_FEN[nr_ostatni_znak]))
-        {
-            liczba_polr = 10 * liczba_polr + pozycja_FEN.charCodeAt(nr_ostatni_znak) - "0".charCodeAt(0);
-        }
-        else
-            return false;
-    }
-    nr_ostatni_znak++;
-
-    // spacje przed iloscia ruchow
-    while(nr_ostatni_znak < pozycja_FEN.length && pozycja_FEN[nr_ostatni_znak] === " ")
-        nr_ostatni_znak++;
-
-    if(pozycja_FEN.length === nr_ostatni_znak)
-        return false;
-
-    while(nr_ostatni_znak < pozycja_FEN.length && !isNaN(pozycja_FEN[nr_ostatni_znak]))
-    {
-        liczba_ruch = liczba_ruch * 10 + pozycja_FEN.charCodeAt(nr_ostatni_znak) - "0".charCodeAt(0);
-        nr_ostatni_znak++;
-    }
-
-    // zapis FEN byl poprawny
-    szachownica.pola = pozycja;
-    szachownica.nr_kolumny_en_passant = nr_kolumny;
-    szachownica.mozna_roszada_biale_OO = w_OO;
-    szachownica.mozna_roszada_biale_OOO = w_OOO;
-    szachownica.mozna_roszada_czarne_OO = b_OO;
-    szachownica.mozna_roszada_czarne_OOO = b_OOO;
-    szachownica.biale_ruch = w_move;
-    szachownica.liczba_polowek_od_r = liczba_polr;
-    gracz_jako_bialy = w_move;
-
-    strona_rysowanie = w_move ? 0 : 1;
-
-    return true;
 }
