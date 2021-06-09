@@ -10,7 +10,7 @@ function wykonaj_ruch_SI()
         if(czy_szach(szachownica.biale_ruch))
         {
             // mat, SI przegralo
-            napisz_wynik(szachownica.biale_ruch ? 1 : 2);
+            napisz_wynik(szachownica.biale_ruch ? 2 : 1);
         }
         else
         {
@@ -29,6 +29,16 @@ function wykonaj_ruch_SI()
         ruch_t = ruchy.zbicia[nr - ruchy.ruchy.length];
 
     wykonaj_ruch(ruch_t);
+    if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 6 && ruch_t.wiersz_k === 7)
+    {
+        // promocja biale
+        promuj_piona(ruch_t.wiersz_k, ruch_t.kolumna_k, Math.floor(Math.random() * 4) + 2);
+    }
+    else if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 12 && ruch_t.wiersz_k === 0)
+    {
+        // promocja czarne
+        promuj_piona(ruch_t.wiersz_k, ruch_t.kolumna_k, Math.floor(Math.random() * 4) + 8);
+    }
 
     narysuj();
 }

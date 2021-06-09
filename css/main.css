@@ -74,6 +74,17 @@ a
     color: red;
 }
 
+#promowanie_piona
+{
+    clear: both;
+    margin: auto;
+}
+
+.wybor_promocja_bierka
+{
+    width: 7vw;
+}
+
 .pole
 {
     padding: 0px;

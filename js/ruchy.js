@@ -189,6 +189,25 @@ function zaznacz_dostepne()
     }
 }
 
+// promuje piona na pozycji (wiersz, kolumna) na figure
+function promuj_piona(wiersz, kolumna, figura)
+{
+    szachownica.zostalo[figura]++;
+    szachownica.zostalo[szachownica.pola[wiersz][kolumna]]--;
+    szachownica.pola[wiersz][kolumna] = figura;
+}
+
+// promuje obecnie wybranego piona na figure
+function promowanie_gracz(nr_bierki, wiersz, kolumna)
+{
+    promuj_piona(wiersz, kolumna, nr_bierki);
+    przygotoj_wybor_promocji(true, true);
+
+    narysuj();
+    przejdz_nastepny_ruch();
+    narysuj();
+}
+
 // zrobic obsluge promocji piona i roszady!!!
 // wykonuje na szachownicy podany ruch
 function wykonaj_ruch(ruch_t)
@@ -272,6 +291,31 @@ function wykonaj_ruch(ruch_t)
     // zrobic obsluge promocji piona
 }
 
+// wykonuje ruch SI i generuje ruchy dla gracza
+function przejdz_nastepny_ruch()
+{
+    wykonaj_ruch_SI();
+
+    ruchy_dostepne = generuj_ruchy();
+
+    // sprawdzanie czy jest mat/pat
+    if(ruchy_dostepne.ruchy.length + ruchy_dostepne.zbicia.length === 0)
+    {
+        if(czy_szach(szachownica.biale_ruch))
+        {
+            // mat, SI wygralo
+            napisz_wynik(szachownica.biale_ruch ? 2 : 1);
+        }
+        else
+        {
+            // pat, remis
+            napisz_wynik(3);
+        }
+
+        szachownica.biale_ruch = !szachownica.biale_ruch;
+    }
+}
+
 // uzupelnic te funkcje o promocje piona
 // sprawdza czy mozliwe jest zabranie bierki z pola o podanych wspolrzednych,
 // jezeli tak, to zaznacza ta bierke jako wzieta i wylicza dostepne pola,
@@ -297,29 +341,21 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
         wzieta.czy = false;
 
         // obsluga promocji piona
-
-        wykonaj_ruch_SI();
-
-        ruchy_dostepne = generuj_ruchy();
-
-        // sprawdzanie czy jest mat/pat
-        if(ruchy_dostepne.ruchy.length + ruchy_dostepne.zbicia.length === 0)
+        
+        if(!szachownica.biale_ruch && ruch_t.wiersz_k === 7 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 6) // negacja, bo funkcja wykonaj_ruch() zmienila wartosc szachownica.biale_ruch
         {
-            if(czy_szach(szachownica.biale_ruch))
-            {
-                // mat, SI wygralo
-                napisz_wynik(szachownica.biale_ruch ? 2 : 1);
-            }
-            else
-            {
-                // pat, remis
-                napisz_wynik(3);
-            }
-
-            szachownica.biale_ruch = !szachownica.biale_ruch;
+            // promocja biale
+            przygotoj_wybor_promocji(false, true, wiersz, kolumna);
+        }
+        else if(szachownica.biale_ruch && ruch_t.wiersz_k === 0 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 12)
+        {
+            // promocja czarne
+            przygotoj_wybor_promocji(false, false, wiersz, kolumna);
+        }
+        else
+        {
             narysuj();
-
-            return;
+            przejdz_nastepny_ruch();
         }
     }
     else if((wzieta.czy && wzieta.wiersz === wiersz && wzieta.kolumna === kolumna) || !czy_moze_ruszyc)

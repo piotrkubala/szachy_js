@@ -37,6 +37,27 @@ function napisz_wynik(wynik)
     }
 }
 
+// uzupelnia div promowanie_piona
+// pierwszy argument okresla, czy tylko wyczyscic div, drugi okresla strone
+// kolejne okreslaja polozenie promowanego piona
+function przygotoj_wybor_promocji(wyczysc, czy_biale, wiersz, kolumna)
+{
+    let nr_bierki, sciezka, div_t = document.getElementById("promowanie_piona");
+
+    div_t.innerHTML = "";
+    if(wyczysc)
+        return;
+
+    for(let i = 0; i < 4; i++)
+    {
+        nr_bierki = i + (czy_biale ? 2 : 8);
+
+        sciezka = numer_na_sciezke(nr_bierki);
+
+        div_t.innerHTML += "<img class=\"wybor_promocja_bierka\" src=\"" + sciezka + "\" onclick=\"promowanie_gracz(" + nr_bierki + ", " + wiersz + ", " + kolumna + ")\">";
+    }
+}
+
 // zwraca kod HTML jednego diva pola szachownicy na podstawie jego wspolrzednych i szerokosci pola w pikselach
 function dodaj_jedno_pole(szerokosc_zdj, i, j)
 {
