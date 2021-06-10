@@ -7,6 +7,7 @@ function przygotuj()
     napisz_wynik(0);
     przygotuj_szachownice();
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    ustaw_ocen_statycznie();
     ruchy_dostepne = generuj_ruchy();
     zablokowane = false;
     narysuj();
@@ -31,6 +32,7 @@ function nowa_partia()
         czy: false
     };
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    ustaw_ocen_statycznie();
     ruchy_dostepne = generuj_ruchy();
     zablokowane = false;
 
@@ -82,6 +84,7 @@ function wczytaj_z_FEN()
         div_blad.innerHTML = "";
 
         napisz_wynik(0);
+        ustaw_ocen_statycznie();
 
         ruchy_dostepne = generuj_ruchy();
 

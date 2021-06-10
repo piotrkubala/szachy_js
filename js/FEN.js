@@ -241,7 +241,15 @@ function wypelnij_z_FEN(pozycja_FEN)
             wiersz: wiersz_kb,
             kolumna: kolumna_kb
         },
-        zostalo: new Array(13)
+        zostalo: new Array(13),
+        ocena:
+        {
+            faza_gry: 0,
+            material: 0,
+            tablice: 0,
+            tablice_koncowka: 0,
+            piony: 0
+        }
     }
 
     for(let i = 0; i < 13; i++)

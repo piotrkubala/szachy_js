@@ -18,7 +18,15 @@ let szachownica =
         wiersz: 0,
         kolumna: 0
     },
-    zostalo: new Array(13) // przechowuje informacje o ilosci pozostalych na szachownicy bierek
+    zostalo: new Array(13), // przechowuje informacje o ilosci pozostalych na szachownicy bierek
+    ocena: // przechowuje statyczna ocene pozycji
+    {
+        faza_gry: 0, // przechowuje liczbe, ktora okresla faze gry z przedzialu <0; 70>, im blizej 0, tym bardziej jest koncowka
+        material: 0, // przechowuje ocene na podstawie materialu (dodatnie dla bialych)
+        tablice: 0, // przechowuje ocene na podstawie tablic (otwarcie, gra srodkowa)
+        tablice_koncowka: 0, // przechowuje ocene na podstawie tablic w koncowce
+        piony: 0 // przechowuje ocene na podstawie struktury pionow
+    }
 }
 
 let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
@@ -212,8 +220,7 @@ function promowanie_gracz(nr_bierki, wiersz, kolumna)
     narysuj();
 }
 
-// zrobic obsluge promocji piona i roszady!!!
-// wykonuje na szachownicy podany ruch
+// wykonuje na szachownicy podany ruch, zmienia szachownica.ocena
 function wykonaj_ruch(ruch_t)
 {
     // ruch krolem
@@ -263,36 +270,47 @@ function wykonaj_ruch(ruch_t)
     // en passant biale
     if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 6 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 0 && ruch_t.kolumna_p != ruch_t.kolumna_k)
     {
+        zmien_ocene_usun(ruch_t.wiersz_p, ruch_t.kolumna_k);
+
         szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_k] = 0;
         szachownica.zostalo[12]--;
+
+        // zmiana oceny
     }
     else if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 12 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 0 && ruch_t.kolumna_p != ruch_t.kolumna_k) // en passant czarne
     {
+        zmien_ocene_usun(ruch_t.wiersz_p, ruch_t.kolumna_k);
+
         szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_k] = 0;
         szachownica.zostalo[6]--;
+
+        // zmiana oceny
     }
 
-    
     // wykonywanie roszady
     if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 1 || szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 7)
     {
         if(ruch_t.kolumna_k - ruch_t.kolumna_p === 2) // roszada krotka
         {
+            zmien_ocene({wiersz_p: ruch_t.wiersz_p, kolumna_p: 7, wiersz_k: ruch_t.wiersz_k, kolumna_k: ruch_t.kolumna_k - 1});
+
             szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k - 1] = szachownica.pola[ruch_t.wiersz_p][7];
             szachownica.pola[ruch_t.wiersz_p][7] = 0;
         }
         else if(ruch_t.kolumna_k - ruch_t.kolumna_p === -2) // roszada dluga
         {
+            zmien_ocene({wiersz_p: ruch_t.wiersz_p, kolumna_p: 0, wiersz_k: ruch_t.wiersz_k, kolumna_k: ruch_t.kolumna_k + 1});
+
             szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k + 1] = szachownica.pola[ruch_t.wiersz_p][0];
             szachownica.pola[ruch_t.wiersz_p][0] = 0;
         }
     }
 
+    zmien_ocene(ruch_t);
+
     szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] = szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p];
     szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] = 0;
     szachownica.biale_ruch = !szachownica.biale_ruch;
-
-    // zrobic obsluge promocji piona
 }
 
 // wykonuje ruch SI i generuje ruchy dla gracza
