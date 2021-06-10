@@ -22,6 +22,7 @@ let szachownica =
 }
 
 let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
+let zablokowane = true; // okresla czy mozna obecnie wykonac ruch lub czy gra zostala zakonczona
 
 let dostepne; // tablica 2D, przechowuje wartosc bool okreslajaca czy trzymana bierka moze przemiescic sie na dane pole
 
@@ -204,6 +205,9 @@ function promowanie_gracz(nr_bierki, wiersz, kolumna)
     przygotoj_wybor_promocji(true, true);
 
     narysuj();
+    
+    zablokowane = false;
+
     przejdz_nastepny_ruch();
     narysuj();
 }
@@ -294,6 +298,9 @@ function wykonaj_ruch(ruch_t)
 // wykonuje ruch SI i generuje ruchy dla gracza
 function przejdz_nastepny_ruch()
 {
+    if(zablokowane)
+        return;
+
     wykonaj_ruch_SI();
 
     ruchy_dostepne = generuj_ruchy();
@@ -313,6 +320,7 @@ function przejdz_nastepny_ruch()
         }
 
         szachownica.biale_ruch = !szachownica.biale_ruch;
+        zablokowane = true;
     }
 }
 
@@ -322,6 +330,9 @@ function przejdz_nastepny_ruch()
 // na ktore moze sie ruszyc, pozniej rysuje szachownice
 function wez_lub_przesun_bierke(wiersz, kolumna)
 {
+    if(zablokowane)
+        return;
+
     let czy_moze_ruszyc = (szachownica.biale_ruch && gracz_jako_bialy && szachownica.pola[wiersz][kolumna] <= 6 && szachownica.pola[wiersz][kolumna] >= 1);
     czy_moze_ruszyc ||= (!szachownica.biale_ruch && !gracz_jako_bialy && szachownica.pola[wiersz][kolumna] >= 7 && szachownica.pola[wiersz][kolumna] <= 12);
 
@@ -346,11 +357,13 @@ function wez_lub_przesun_bierke(wiersz, kolumna)
         {
             // promocja biale
             przygotoj_wybor_promocji(false, true, wiersz, kolumna);
+            zablokowane = true;
         }
         else if(szachownica.biale_ruch && ruch_t.wiersz_k === 0 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 12)
         {
             // promocja czarne
             przygotoj_wybor_promocji(false, false, wiersz, kolumna);
+            zablokowane = true;
         }
         else
         {

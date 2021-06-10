@@ -8,6 +8,7 @@ function przygotuj()
     przygotuj_szachownice();
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     ruchy_dostepne = generuj_ruchy();
+    zablokowane = false;
     narysuj();
     window.onresize = narysuj;
 }
@@ -31,6 +32,7 @@ function nowa_partia()
     };
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     ruchy_dostepne = generuj_ruchy();
+    zablokowane = false;
 
     narysuj();
 }
@@ -47,6 +49,9 @@ function obroc_szachownice()
 // zmienia strone gracza ludzkiego
 function zmien_kolor_gracza()
 {
+    if(zablokowane)
+        return;
+
     gracz_jako_bialy = !gracz_jako_bialy;
 
     wykonaj_ruch_SI();
@@ -76,7 +81,11 @@ function wczytaj_z_FEN()
         document.getElementById("wprowadzanie_FEN").value = "";
         div_blad.innerHTML = "";
 
+        napisz_wynik(0);
+
         ruchy_dostepne = generuj_ruchy();
+
+        zablokowane = false;
 
         narysuj();
     }

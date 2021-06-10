@@ -5,6 +5,7 @@ function wypelnij_z_FEN(pozycja_FEN)
 {
     let nr_kolumny = -1, w_OO = false, w_OOO = false, b_OO = false, b_OOO = false, w_move = false;
     let liczba_polr = 0, liczba_ruch = 0;
+    let wiersz_kw, kolumna_kw, wiersz_kb, kolumna_kb;
 
     let byl_krol_w = false, byl_krol_b = false;
 
@@ -61,16 +62,16 @@ function wypelnij_z_FEN(pozycja_FEN)
             {
                 byl_krol_w = true;
 
-                szachownica.poz_krol_biale.wiersz = wiersz;
-                szachownica.poz_krol_biale.kolumna = kolumna;
+                wiersz_kw = wiersz;
+                kolumna_kw = kolumna;
             }
 
             if(nr_bierki === 7)
             {
                 byl_krol_b = true;
 
-                szachownica.poz_krol_czarne.wiersz = wiersz;
-                szachownica.poz_krol_czarne.kolumna = kolumna;
+                wiersz_kb = wiersz;
+                kolumna_kb = kolumna;
             }
 
             szachownica.zostalo[nr_bierki]++;
@@ -218,15 +219,46 @@ function wypelnij_z_FEN(pozycja_FEN)
         nr_ostatni_znak++;
     }
 
-    // zapis FEN byl poprawny
-    szachownica.pola = pozycja;
-    szachownica.nr_kolumny_en_passant = nr_kolumny;
-    szachownica.mozna_roszada_biale_OO = w_OO;
-    szachownica.mozna_roszada_biale_OOO = w_OOO;
-    szachownica.mozna_roszada_czarne_OO = b_OO;
-    szachownica.mozna_roszada_czarne_OOO = b_OOO;
-    szachownica.biale_ruch = w_move;
-    szachownica.liczba_polowek_od_r = liczba_polr;
+    let kopia_szach = szachownica;
+
+    szachownica =
+    {
+        pola: pozycja,
+        nr_kolumny_en_passant: nr_kolumny,
+        mozna_roszada_biale_OO: w_OO,
+        mozna_roszada_biale_OOO: w_OOO,
+        mozna_roszada_czarne_OO: b_OO,
+        mozna_roszada_czarne_OOO: b_OOO,
+        biale_ruch: w_move,
+        liczba_polowek_od_r: liczba_polr,
+        poz_krol_biale:
+        {
+            wiersz: wiersz_kw,
+            kolumna: kolumna_kw
+        },
+        poz_krol_czarne:
+        {
+            wiersz: wiersz_kb,
+            kolumna: kolumna_kb
+        },
+        zostalo: new Array(13)
+    }
+
+    for(let i = 0; i < 13; i++)
+        szachownica.zostalo[i] = 0;
+
+    for(let i = 0; i < 8; i++)
+        for(let j = 0; j < 8; j++)
+            szachownica.zostalo[szachownica.pola[i][j]]++;
+
+    if(czy_szach(!w_move))
+    {
+        // bledny FEN - strona, ktora nie wykonuje ruchu jest w szachu
+        szachownica = kopia_szach;
+        
+        return false;
+    }
+    
     gracz_jako_bialy = w_move;
 
     strona_rysowanie = w_move ? 0 : 1;
