@@ -171,7 +171,7 @@ function wartosc_tabela(wiersz, kolumna, nr_bierki)
     let nr = nr_bierki - (czy_biale ? 1 : 7);
     let poz_w_tablicy = kolumna + 8 * (!czy_biale ? wiersz: 7 - wiersz);
 
-    return tabele[nr][poz_w_tablicy];
+    return tabele[nr][poz_w_tablicy] * (czy_biale ? 1 : -1);
 }
 
 // zwraca wartosc z tabeli koncowek
@@ -181,7 +181,7 @@ function wartosc_tabela_konc(wiersz, kolumna, nr_bierki)
     let nr = nr_bierki - (czy_biale ? 1 : 7);
     let poz_w_tablicy = kolumna + 8 * (!czy_biale ? wiersz: 7 - wiersz);
 
-    return tabele_konc[nr][poz_w_tablicy];
+    return tabele_konc[nr][poz_w_tablicy] * (czy_biale ? 1 : -1);
 }
 
 // ustawia szachownica.ocena
