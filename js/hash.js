@@ -130,9 +130,10 @@ function ustaw_hash_pozycji()
 }
 
 // zmienia szachownica.hash, zmieniajac hash od en passant
-// kolor 0 - biale, 1 - czarne
-function hash_en_passant(kolor, kolumna)
+function hash_en_passant(czy_biale, kolumna)
 {
+    let kolor = czy_biale ? 0 : 1;
+
     let ps = liczby_ps_losowe_en_passant[kolor][kolumna];
 
     szachownica.hash[0] ^= ps[0];

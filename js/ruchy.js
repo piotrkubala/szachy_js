@@ -203,6 +203,12 @@ function zaznacz_dostepne()
 // promuje piona na pozycji (wiersz, kolumna) na figure
 function promuj_piona(wiersz, kolumna, figura)
 {
+    zmien_ocene_usun(wiersz, kolumna);
+    zmien_ocene_dodaj(wiersz, kolumna, figura);
+
+    hash_bierka(wiersz, kolumna, szachownica.pola[wiersz][kolumna]);
+    hash_bierka(wiersz, kolumna, figura);
+
     szachownica.zostalo[figura]++;
     szachownica.zostalo[szachownica.pola[wiersz][kolumna]]--;
     szachownica.pola[wiersz][kolumna] = figura;
@@ -230,33 +236,75 @@ function wykonaj_ruch(ruch_t)
     {
         szachownica.poz_krol_biale.wiersz = ruch_t.wiersz_k;
         szachownica.poz_krol_biale.kolumna = ruch_t.kolumna_k;
+
+        if(szachownica.mozna_roszada_biale_OO)
+            hash_roszada(0);
+        
+        if(szachownica.mozna_roszada_biale_OOO)
+            hash_roszada(1);
+
         szachownica.mozna_roszada_biale_OO = szachownica.mozna_roszada_biale_OOO = false; // nie mozna roszady po ruchu krolem
     }
     else if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 7)
     {
         szachownica.poz_krol_czarne.wiersz = ruch_t.wiersz_k;
         szachownica.poz_krol_czarne.kolumna = ruch_t.kolumna_k;
+
+        if(szachownica.mozna_roszada_czarne_OO)
+            hash_roszada(2);
+        
+        if(szachownica.mozna_roszada_czarne_OOO)
+            hash_roszada(3);
+
         szachownica.mozna_roszada_czarne_OO = szachownica.mozna_roszada_czarne_OOO = false; // nie mozna roszady po ruchu krolem
     }
 
     // nie mozna danej roszady po ruchu odpowiednia wieza
     if(ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 0)
+    {
+        if(szachownica.mozna_roszada_biale_OOO)
+            hash_roszada(1);
+
         szachownica.mozna_roszada_biale_OOO = false;
+    }
     else if(ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 7)
+    {
+        if(szachownica.mozna_roszada_biale_OO)
+            hash_roszada(0);
+
         szachownica.mozna_roszada_biale_OO = false;
+    }
     else if(ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 0)
+    {
+        if(szachownica.mozna_roszada_czarne_OOO)
+            hash_roszada(3);
+
         szachownica.mozna_roszada_czarne_OOO = false;
+    }
     else if(ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 7)
+    {
+        if(szachownica.mozna_roszada_czarne_OO)
+            hash_roszada(2);
+
         szachownica.mozna_roszada_czarne_OO = false;
+    }
 
     if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] !== 0)
         szachownica.zostalo[szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k]]--;
+
+    // usuwanie hashu od poprzedniej mozliwosci zbicia w przelocie
+    if(szachownica.nr_kolumny_en_passant !== -1)
+        hash_en_passant(!szachownica.biale_ruch, szachownica.nr_kolumny_en_passant);
 
     if(szachownica.biale_ruch)
     {
         // en passant - zaznaczanie kolumny dla bialych
         if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 6 && ruch_t.wiersz_p === 1 && ruch_t.wiersz_k === 3)
+        {          
             szachownica.nr_kolumny_en_passant = ruch_t.kolumna_k;
+
+            hash_en_passant(szachownica.biale_ruch, szachownica.nr_kolumny_en_passant)
+        }
         else
             szachownica.nr_kolumny_en_passant = -1;
     }
@@ -264,7 +312,11 @@ function wykonaj_ruch(ruch_t)
     {
         // en passant - zaznaczanie kolumny dla czarnych
         if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 12 && ruch_t.wiersz_p === 6 && ruch_t.wiersz_k === 4)
+        {
             szachownica.nr_kolumny_en_passant = ruch_t.kolumna_k;
+
+            hash_en_passant(szachownica.biale_ruch, szachownica.nr_kolumny_en_passant)
+        }
         else
             szachownica.nr_kolumny_en_passant = -1;
     }
@@ -273,20 +325,18 @@ function wykonaj_ruch(ruch_t)
     if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 6 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 0 && ruch_t.kolumna_p != ruch_t.kolumna_k)
     {
         zmien_ocene_usun(ruch_t.wiersz_p, ruch_t.kolumna_k);
+        hash_bierka(ruch_t.wiersz_p, ruch_t.kolumna_k, 12);
 
         szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_k] = 0;
         szachownica.zostalo[12]--;
-
-        // zmiana oceny
     }
     else if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 12 && szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] === 0 && ruch_t.kolumna_p != ruch_t.kolumna_k) // en passant czarne
     {
         zmien_ocene_usun(ruch_t.wiersz_p, ruch_t.kolumna_k);
+        hash_bierka(ruch_t.wiersz_p, ruch_t.kolumna_k, 6);
 
         szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_k] = 0;
         szachownica.zostalo[6]--;
-
-        // zmiana oceny
     }
 
     // wykonywanie roszady
@@ -296,6 +346,9 @@ function wykonaj_ruch(ruch_t)
         {
             zmien_ocene({wiersz_p: ruch_t.wiersz_p, kolumna_p: 7, wiersz_k: ruch_t.wiersz_k, kolumna_k: ruch_t.kolumna_k - 1});
 
+            hash_bierka(ruch_t.wiersz_p, 7, szachownica.pola[ruch_t.wiersz_p][7]);
+            hash_bierka(ruch_t.wiersz_k, ruch_t.kolumna_k - 1, szachownica.pola[ruch_t.wiersz_p][7]);
+
             szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k - 1] = szachownica.pola[ruch_t.wiersz_p][7];
             szachownica.pola[ruch_t.wiersz_p][7] = 0;
         }
@@ -303,12 +356,21 @@ function wykonaj_ruch(ruch_t)
         {
             zmien_ocene({wiersz_p: ruch_t.wiersz_p, kolumna_p: 0, wiersz_k: ruch_t.wiersz_k, kolumna_k: ruch_t.kolumna_k + 1});
 
+            hash_bierka(ruch_t.wiersz_p, 0, szachownica.pola[ruch_t.wiersz_p][0]);
+            hash_bierka(ruch_t.wiersz_k, ruch_t.kolumna_k + 1, szachownica.pola[ruch_t.wiersz_p][0]);
+
             szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k + 1] = szachownica.pola[ruch_t.wiersz_p][0];
             szachownica.pola[ruch_t.wiersz_p][0] = 0;
         }
     }
 
     zmien_ocene(ruch_t);
+
+    if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] !== 0)
+        hash_bierka(ruch_t.wiersz_k, ruch_t.kolumna_k, szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k]);
+
+    hash_bierka(ruch_t.wiersz_p, ruch_t.kolumna_p, szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p]);
+    hash_bierka(ruch_t.wiersz_k, ruch_t.kolumna_k, szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p]);
 
     szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] = szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p];
     szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] = 0;
