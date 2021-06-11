@@ -1,6 +1,7 @@
 let liczby_ps_losowe; // przechowuje liczby pseudolosowe dla pozycji bierek
 let liczby_ps_losowe_en_passant; // przechowuje liczby pseudolosowe dla en passsant
 let liczby_ps_losowe_roszada; // przechowuje liczby pseudolosowe dla roszady
+let liczby_ps_strona; // przechowuje liczby uzywana do zaznaczania strony
 
 function pseudolosowa(x)
 {
@@ -63,6 +64,11 @@ function generuj_ps_losowe()
 
         x = y;
     }
+
+    x = pseudolosowa(x);
+    y = pseudolosowa(x);
+
+    liczby_ps_strona = [x, y];
 }
 
 // ustawia szachownica.hash, obliczajac caly hash od nowa
@@ -127,6 +133,19 @@ function ustaw_hash_pozycji()
         szachownica.hash[0] ^= ps[0];
         szachownica.hash[1] ^= ps[1];
     }
+
+    if(szachownica.czy_biale)
+    {
+        szachownica.hash[0] ^= liczby_ps_strona[0];
+        szachownica.hash[1] ^= liczby_ps_strona[1];
+    }
+}
+
+// zmienia szachownica.hash, zmieniajac hash od zmiany strony wykonujacej ruch
+function hash_strona()
+{
+    szachownica.hash[0] ^= liczby_ps_strona[0];
+    szachownica.hash[1] ^= liczby_ps_strona[1];
 }
 
 // zmienia szachownica.hash, zmieniajac hash od en passant

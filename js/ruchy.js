@@ -375,6 +375,8 @@ function wykonaj_ruch(ruch_t)
     szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] = szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p];
     szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] = 0;
     szachownica.biale_ruch = !szachownica.biale_ruch;
+
+    hash_strona();
 }
 
 // wykonuje ruch SI i generuje ruchy dla gracza
