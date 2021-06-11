@@ -26,7 +26,8 @@ let szachownica =
         tablice: 0, // przechowuje ocene na podstawie tablic (otwarcie, gra srodkowa)
         tablice_koncowka: 0, // przechowuje ocene na podstawie tablic w koncowce
         piony: 0 // przechowuje ocene na podstawie struktury pionow
-    }
+    },
+    hash: [0, 0] // przechowuje hash obecnej pozycji
 }
 
 let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
@@ -47,6 +48,7 @@ function przygotuj_szachownice()
     szachownica.zostalo = new Array(13);
 
     szachownica.pola = new Array();
+    szachownica.hash =  [0, 0];
     dostepne = new Array();
 
     for(let i = 0; i < 13; i++)

@@ -249,7 +249,8 @@ function wypelnij_z_FEN(pozycja_FEN)
             tablice: 0,
             tablice_koncowka: 0,
             piony: 0
-        }
+        },
+        hash:  [0, 0]
     }
 
     for(let i = 0; i < 13; i++)

@@ -209,24 +209,8 @@ function ustaw_ocen_statycznie()
 
             szachownica.ocena.faza_gry += wartosci_faza_gry[nr_bierki];
 
-            if(nr_bierki < 7)
-                czy_biale = true;
-            else
-                czy_biale = false;
-            
-            nr_bierki -= czy_biale ? 1 : 7;
-            poz_w_tablicy = kolumna + 8 * (!czy_biale ? wiersz: 7 - wiersz);
-
-            if(czy_biale)
-            {
-                szachownica.ocena.tablice += tabele[nr_bierki][poz_w_tablicy];
-                szachownica.ocena.tablice_koncowka += tabele_konc[nr_bierki][poz_w_tablicy];
-            }
-            else
-            {
-                szachownica.ocena.tablice -= tabele[nr_bierki][poz_w_tablicy];
-                szachownica.ocena.tablice_koncowka -= tabele_konc[nr_bierki][poz_w_tablicy];
-            }
+            szachownica.ocena.tablice += wartosc_tabela(wiersz, kolumna, nr_bierki);
+            szachownica.ocena.tabele_koncowka += wartosc_tabela_konc(wiersz, kolumna, nr_bierki);
         }
     }
 
@@ -245,6 +229,20 @@ function zmien_ocene(ruch_t)
 
     szachownica.ocena.tablice += wartosc_tabela(ruch_t.wiersz_k, ruch_t.kolumna_k, nr_bierki_p) - wartosc_tabela(ruch_t.wiersz_p, ruch_t.kolumna_p, nr_bierki_p);
     szachownica.ocena.tablice_koncowka += wartosc_tabela_konc(ruch_t.wiersz_k, ruch_t.kolumna_k, nr_bierki_p) - wartosc_tabela_konc(ruch_t.wiersz_p, ruch_t.kolumna_p, nr_bierki_p);
+}
+
+// zmienia ocene odpowiadajaca umieszczeniu danej bierki na danym polu
+// zalozenie: szachownica.pola[wiersz][kolumna] === 0
+function zmien_ocene_dodaj(wiersz, kolumna, nr_bierki)
+{
+    szachownica.ocena.material += wartosci[nr_bierki];
+    szachownica.faza_gry += wartosci_faza_gry[nr_bierki];
+
+    if(szachownica.faza_gry > 70)
+        szachownica.faza_gry = 70;
+
+    szachownica.ocena.tablice += wartosc_tabela(wiersz, kolumna, nr_bierki);
+    szachownica.ocena.tabele_koncowka += wartosc_tabela_konc(wiersz, kolumna, nr_bierki);
 }
 
 // zmienia ocene odpowiadajaca usunieciu bierki z danego pola
@@ -268,11 +266,5 @@ function zmien_ocene_usun(wiersz, kolumna)
 // zwraca statyczna ocene pozycji na podstawie szachownica.ocena
 function ocen_statycznie()
 {
-    return szachownica.ocena.material +
-        (szachownica.ocena.faza_gry * szachownica.ocena.tablice +
-            (70 - szachownica.ocena.faza_gry) * (szachownica.ocena.tablice_koncowka +
-                30 / Math.max(Math.abs(szachownica.poz_krol_biale.wiersz - szachownica.poz_krol_czarne.wiersz),
-                    Math.abs(szachownica.poz_krol_biale.kolumna - szachownica.poz_krol_czarne.kolumna)
-                )))
-            * 0.03;
+    return szachownica.ocena.material + (szachownica.ocena.faza_gry * szachownica.ocena.tablice + (70 - szachownica.ocena.faza_gry) * szachownica.ocena.tablice_koncowka) * 0.03;
 }

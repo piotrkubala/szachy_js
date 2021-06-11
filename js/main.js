@@ -5,9 +5,11 @@ let rysowac_oznaczenia_wspolrzednych = true;// okresla czy nalezy rysowac oznacz
 function przygotuj()
 {
     napisz_wynik(0);
+    generuj_ps_losowe();
     przygotuj_szachownice();
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     ustaw_ocen_statycznie();
+    ustaw_hash_pozycji();
     ruchy_dostepne = generuj_ruchy();
     zablokowane = false;
     narysuj();
@@ -33,6 +35,7 @@ function nowa_partia()
     };
     wypelnij_z_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     ustaw_ocen_statycznie();
+    ustaw_hash_pozycji();
     ruchy_dostepne = generuj_ruchy();
     zablokowane = false;
 
@@ -85,6 +88,7 @@ function wczytaj_z_FEN()
 
         napisz_wynik(0);
         ustaw_ocen_statycznie();
+        ustaw_hash_pozycji();
 
         ruchy_dostepne = generuj_ruchy();
 
