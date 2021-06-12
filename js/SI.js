@@ -18,6 +18,19 @@ function wykonaj_ruch_SI()
             napisz_wynik(3);
         }
 
+        zablokowane = true;
+
+        return;
+    }
+
+    // sprawdzanie pozostalych remisow
+    if(szachownica.liczba_polowek_od_r > 100 || poprzednie_pozycje[szachownica.hash] >= 3 || !czy_wystarczajacy_material())
+    {
+        napisz_wynik(3);
+
+        szachownica.biale_ruch = !szachownica.biale_ruch;
+        zablokowane = true;
+
         return;
     }
 

@@ -11,6 +11,7 @@ function przygotuj()
     ustaw_ocen_statycznie();
     ustaw_hash_pozycji();
     ruchy_dostepne = generuj_ruchy();
+    dodaj_pozycje();
     zablokowane = false;
     narysuj();
     window.onresize = narysuj;
@@ -37,6 +38,7 @@ function nowa_partia()
     ustaw_ocen_statycznie();
     ustaw_hash_pozycji();
     ruchy_dostepne = generuj_ruchy();
+    dodaj_pozycje();
     zablokowane = false;
 
     narysuj();
@@ -90,9 +92,19 @@ function wczytaj_z_FEN()
         ustaw_ocen_statycznie();
         ustaw_hash_pozycji();
 
-        ruchy_dostepne = generuj_ruchy();
+        poprzednie_pozycje = new Map();
 
-        zablokowane = false;
+        ruchy_dostepne = generuj_ruchy();
+        dodaj_pozycje();
+
+        if(czy_wystarczajacy_material())
+            zablokowane = false;
+        else
+        {
+            napisz_wynik(3);
+
+            szachownica.biale_ruch = !szachownica.biale_ruch;
+        }
 
         narysuj();
     }

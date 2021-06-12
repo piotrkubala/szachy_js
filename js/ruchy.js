@@ -30,6 +30,8 @@ let szachownica =
     hash: [0, 0] // przechowuje hash obecnej pozycji
 }
 
+let poprzednie_pozycje; // mapa przechowujaca dla danego hasha ile razy wystapil
+
 let gracz_jako_bialy = true; // okresla czy czlowiek gra jako bialy
 let zablokowane = true; // okresla czy mozna obecnie wykonac ruch lub czy gra zostala zakonczona
 
@@ -42,7 +44,7 @@ let ruchy_dostepne =
     zbicia: Array()
 };
 
-// przygotowuje pusta szachownice jako szachownica.pola i tablice dostepne
+// przygotowuje pusta szachownice jako szachownica.pola, tablice dostepne i poprzednie_pozycje
 function przygotuj_szachownice()
 {
     szachownica.zostalo = new Array(13);
@@ -50,6 +52,8 @@ function przygotuj_szachownice()
     szachownica.pola = new Array();
     szachownica.hash =  [0, 0];
     dostepne = new Array();
+
+    poprzednie_pozycje = new Map();
 
     for(let i = 0; i < 13; i++)
         szachownica.zostalo[i] = 0;
@@ -123,6 +127,27 @@ function czy_szach(dla_bialych)
     }
 
     return false;
+}
+
+// sprawdza czy material jest wystarczajacy do zrobienia mata
+function czy_wystarczajacy_material()
+{
+    if(szachownica.zostalo[2] > 0 || szachownica.zostalo[8] > 0 || szachownica.zostalo[3] > 0 || szachownica.zostalo[9] > 0)
+        return true;
+    if(szachownica.zostalo[4] > 1 || szachownica.zostalo[9] > 1)
+        return true;
+    if(szachownica.zostalo[5] > 2 || szachownica.zostalo[11] > 2)
+        return true;
+    return szachownica.zostalo[6] > 0 || szachownica.zostalo[12] > 0;
+}
+
+// zmienia mape poprzednie_pozycje odpowiadajaca obecnej pozycji
+function dodaj_pozycje()
+{
+    if(poprzednie_pozycje[szachownica.hash])
+        poprzednie_pozycje[szachownica.hash]++;
+    else
+        poprzednie_pozycje[szachownica.hash] = 1;
 }
 
 // generuje mozliwe ruchy
@@ -367,7 +392,13 @@ function wykonaj_ruch(ruch_t)
     zmien_ocene(ruch_t);
 
     if(szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k] !== 0)
+    {
         hash_bierka(ruch_t.wiersz_k, ruch_t.kolumna_k, szachownica.pola[ruch_t.wiersz_k][ruch_t.kolumna_k]);
+        szachownica.liczba_polowek_od_r = -1;
+    }
+
+    if(szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 6 || szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p] === 12)
+        szachownica.liczba_polowek_od_r = -1;
 
     hash_bierka(ruch_t.wiersz_p, ruch_t.kolumna_p, szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p]);
     hash_bierka(ruch_t.wiersz_k, ruch_t.kolumna_k, szachownica.pola[ruch_t.wiersz_p][ruch_t.kolumna_p]);
@@ -377,6 +408,10 @@ function wykonaj_ruch(ruch_t)
     szachownica.biale_ruch = !szachownica.biale_ruch;
 
     hash_strona();
+
+    szachownica.liczba_polowek_od_r++;
+
+    dodaj_pozycje();
 }
 
 // wykonuje ruch SI i generuje ruchy dla gracza
@@ -402,6 +437,15 @@ function przejdz_nastepny_ruch()
             // pat, remis
             napisz_wynik(3);
         }
+
+        szachownica.biale_ruch = !szachownica.biale_ruch;
+        zablokowane = true;
+    }
+
+    // sprawdzanie pozostalych remisow
+    if(szachownica.liczba_polowek_od_r > 100 || poprzednie_pozycje[szachownica.hash] >= 3 || !czy_wystarczajacy_material())
+    {
+        napisz_wynik(3);
 
         szachownica.biale_ruch = !szachownica.biale_ruch;
         zablokowane = true;
