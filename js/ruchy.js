@@ -253,7 +253,6 @@ function promowanie_gracz(nr_bierki, wiersz, kolumna)
     narysuj();
 }
 
-// zrobic jeszcze usuwanie mozliwosci roszady po zbiciu odpowiedniej wiezy!!!
 // wykonuje na szachownicy podany ruch, zmienia szachownica.ocena
 function wykonaj_ruch(ruch_t)
 {
@@ -285,29 +284,29 @@ function wykonaj_ruch(ruch_t)
         szachownica.mozna_roszada_czarne_OO = szachownica.mozna_roszada_czarne_OOO = false; // nie mozna roszady po ruchu krolem
     }
 
-    // nie mozna danej roszady po ruchu odpowiednia wieza
-    if(ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 0)
+    // nie mozna danej roszady po ruchu odpowiednia wieza lub zbiciu odpowiedniej wiezy
+    if((ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 0) || (ruch_t.wiersz_k === 0 && ruch_t.kolumna_k === 0))
     {
         if(szachownica.mozna_roszada_biale_OOO)
             hash_roszada(1);
 
         szachownica.mozna_roszada_biale_OOO = false;
     }
-    else if(ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 7)
+    else if((ruch_t.wiersz_p === 0 && ruch_t.kolumna_p === 7) || (ruch_t.wiersz_k === 0 && ruch_t.kolumna_k === 7))
     {
         if(szachownica.mozna_roszada_biale_OO)
             hash_roszada(0);
 
         szachownica.mozna_roszada_biale_OO = false;
     }
-    else if(ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 0)
+    else if((ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 0) || (ruch_t.wiersz_k === 7 && ruch_t.kolumna_k === 0))
     {
         if(szachownica.mozna_roszada_czarne_OOO)
             hash_roszada(3);
 
         szachownica.mozna_roszada_czarne_OOO = false;
     }
-    else if(ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 7)
+    else if((ruch_t.wiersz_p === 7 && ruch_t.kolumna_p === 7) || (ruch_t.wiersz_k === 7 && ruch_t.kolumna_k === 7))
     {
         if(szachownica.mozna_roszada_czarne_OO)
             hash_roszada(2);
