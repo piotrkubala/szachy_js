@@ -253,6 +253,7 @@ function promowanie_gracz(nr_bierki, wiersz, kolumna)
     narysuj();
 }
 
+// zrobic jeszcze usuwanie mozliwosci roszady po zbiciu odpowiedniej wiezy!!!
 // wykonuje na szachownicy podany ruch, zmienia szachownica.ocena
 function wykonaj_ruch(ruch_t)
 {

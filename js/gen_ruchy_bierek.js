@@ -136,7 +136,7 @@ function generuj_ruch_krol(czy_biale, ruchy, wiersz, kolumna)
     }
 
     // roszada dluga
-    if(czy_moze_w_lewo && szachownica.pola[wiersz][kolumna - 2] === 0)
+    if(czy_moze_w_lewo && szachownica.pola[wiersz][kolumna - 2] === 0 && szachownica.pola[wiersz][kolumna - 3] === 0)
     {
         if((czy_biale && szachownica.mozna_roszada_biale_OOO) || (!czy_biale && szachownica.mozna_roszada_czarne_OOO))
         {
